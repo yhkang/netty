@@ -344,6 +344,7 @@ class EpollEventLoop extends SingleThreadEventLoop {
                             if (!hasTasks()) {
                                 if (curDeadlineNanos == prevDeadlineNanos) {
                                     // No timer activity needed
+                                    // 系统调用epollWait
                                     strategy = epollWaitNoTimerChange();
                                 } else {
                                     // Timerfd needs to be re-armed or disarmed

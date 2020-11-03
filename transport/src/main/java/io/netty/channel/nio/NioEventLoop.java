@@ -431,6 +431,12 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
     }
 
+    /**
+     * 主要步骤
+     * NioEventLoop.select方法，调用底层的epoll select 方法获取read的事件
+     * processSelectedKeys 中处理就绪的事件。
+     * runAllTasks 执行队列中的任务
+     */
     @Override
     protected void run() {
         int selectCnt = 0;
@@ -454,6 +460,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                         nextWakeupNanos.set(curDeadlineNanos);
                         try {
                             if (!hasTasks()) {
+                                // nio select（底层为系统调用poll）获取事件，返回就绪描述符个数
                                 strategy = select(curDeadlineNanos);
                             }
                         } finally {
@@ -490,8 +497,10 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 } else if (strategy > 0) {
                     final long ioStartTime = System.nanoTime();
                     try {
+                        // 循环处理所有就绪事件
                         processSelectedKeys();
                     } finally {
+                        // 执行队列中的任务
                         // Ensure we always run tasks.
                         final long ioTime = System.nanoTime() - ioStartTime;
                         ranTasks = runAllTasks(ioTime * (100 - ioRatio) / ioRatio);
@@ -716,6 +725,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             // Also check for readOps of 0 to workaround possible JDK bug which may otherwise lead
             // to a spin loop
             if ((readyOps & (SelectionKey.OP_READ | SelectionKey.OP_ACCEPT)) != 0 || readyOps == 0) {
+                //当一个client注册上来产生一个accept或reade事件的时候
                 unsafe.read();
             }
         } catch (CancelledKeyException ignored) {

@@ -144,6 +144,7 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
 
     @Override
     protected int doReadMessages(List<Object> buf) throws Exception {
+        // Netty会为这个事件新生成一个NioSocketChannel，并且为它添加childHandler，后续的读写事件便基于这个NioSocketChannel。
         SocketChannel ch = SocketUtils.accept(javaChannel());
 
         try {
