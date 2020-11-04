@@ -1364,6 +1364,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
+            // 最后的写入操作
             unsafe.write(msg, promise);
         }
 

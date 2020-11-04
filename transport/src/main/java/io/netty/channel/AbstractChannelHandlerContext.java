@@ -378,6 +378,7 @@ abstract class AbstractChannelHandlerContext implements ChannelHandlerContext, R
             try {
                 ((ChannelInboundHandler) handler()).channelRead(this, msg);
             } catch (Throwable t) {
+                // 异常处理
                 invokeExceptionCaught(t);
             }
         } else {
@@ -749,6 +750,7 @@ abstract class AbstractChannelHandlerContext implements ChannelHandlerContext, R
         try {
             ((ChannelOutboundHandler) handler()).flush(this);
         } catch (Throwable t) {
+            //异常处理
             invokeExceptionCaught(t);
         }
     }
@@ -785,6 +787,7 @@ abstract class AbstractChannelHandlerContext implements ChannelHandlerContext, R
                 (MASK_WRITE | MASK_FLUSH) : MASK_WRITE);
         final Object m = pipeline.touch(msg, next);
         EventExecutor executor = next.executor();
+        //netty为了保证程序的高效执行，所有的核心的操作都在reactor线程中处理，如果业务线程调用Channel的读写方法，netty会将该操作封装成一个task，随后在reactor线程中执行
         if (executor.inEventLoop()) {
             if (flush) {
                 next.invokeWriteAndFlush(m, promise);
